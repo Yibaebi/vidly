@@ -1,3 +1,4 @@
 const genres = require('./genres')
+const customers = require('./customers')
 
-module.exports.genres = genres
+module.exports = { genres, customers }

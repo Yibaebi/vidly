@@ -165,11 +165,11 @@ router.delete('/:id', async (req, res) => {
 
 // Validation fn for a genre
 function validateGenre(genre) {
-  const schema = {
+  const schema = Joi.object({
     title: Joi.string().min(3).required()
-  }
+  })
 
-  return Joi.validate(genre, schema)
+  return schema.validate(genre)
 }
 
 module.exports = router

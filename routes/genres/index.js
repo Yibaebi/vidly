@@ -1,7 +1,6 @@
 const express = require('express')
-const Joi = require('joi')
 
-const { GenreModel } = require('../../models')
+const { Genre, validateGenre } = require('../../models')
 const { parseError } = require('../../utils')
 
 // Setup router
@@ -9,7 +8,7 @@ const router = express.Router()
 
 // Get all movie genres
 router.get('/', async (req, res) => {
-  const genres = await GenreModel.find()
+  const genres = await Genre.find()
   res.status(200).send({ status: 200, data: genres, count: genres.length })
 })
 
@@ -18,7 +17,7 @@ router.get('/:id', async (req, res) => {
   const id = req.params.id
 
   try {
-    const genre = await GenreModel.findById(id)
+    const genre = await Genre.findById(id)
 
     if (!genre) {
       return res.status(404).send({
@@ -54,7 +53,7 @@ router.post('/', async (req, res) => {
   const newGenreTitle = req.body.title
   const titlePattern = new RegExp('^' + newGenreTitle.trim() + '$', 'i')
 
-  const genre = await GenreModel.findOne({
+  const genre = await Genre.findOne({
     title: titlePattern
   })
 
@@ -66,7 +65,7 @@ router.post('/', async (req, res) => {
     })
   }
 
-  let newGenre = new GenreModel({
+  let newGenre = new Genre({
     title: newGenreTitle
   })
 
@@ -94,7 +93,7 @@ router.put('/:id', async (req, res) => {
   }
 
   const newGenreTitle = req.body.title
-  const genre = await GenreModel.findById(genreId)
+  const genre = await Genre.findById(genreId)
 
   if (genre) {
     // New genre title Regex pattern
@@ -108,7 +107,7 @@ router.put('/:id', async (req, res) => {
     }
 
     // Check if Genre title already exists in DB
-    const genreWithTitle = await GenreModel.findOne({
+    const genreWithTitle = await Genre.findOne({
       _id: { $ne: genreId },
       title: titlePattern
     })
@@ -144,7 +143,7 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const genreId = req.params.id
 
-  const deletedGenre = await GenreModel.findByIdAndDelete(genreId)
+  const deletedGenre = await Genre.findByIdAndDelete(genreId)
 
   if (deletedGenre) {
     res.status(200).send({
@@ -162,14 +161,5 @@ router.delete('/:id', async (req, res) => {
 
   res.end()
 })
-
-// Validation fn for a genre
-function validateGenre(genre) {
-  const schema = Joi.object({
-    title: Joi.string().min(3).required()
-  })
-
-  return schema.validate(genre)
-}
 
 module.exports = router

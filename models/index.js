@@ -1,7 +1,7 @@
-const GenreModel = require('./genre')
-const CustomerModel = require('./customer')
+const genre = require('./genre')
+const customer = require('./customer')
 
 module.exports = {
-  GenreModel,
-  CustomerModel
+  ...genre,
+  ...customer
 }

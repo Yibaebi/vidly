@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 const dbDebugger = require('debug')('app:db')
 
 const { logger, authenticator } = require('./middlewares')
-const { genres, customers } = require('./routes')
+const { genres, customers, movies } = require('./routes')
 
 // Set up server
 const app = express()
@@ -23,6 +23,7 @@ mongoose
 // Routes
 app.use('/api/genres', genres)
 app.use('/api/customers', customers)
+app.use('/api/movies', movies)
 
 // Setup port
 const PORT = process.env.PORT || '3000'

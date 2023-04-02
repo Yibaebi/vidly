@@ -143,23 +143,30 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const genreId = req.params.id
 
-  const deletedGenre = await Genre.findByIdAndDelete(genreId)
+  try {
+    const deletedGenre = await Genre.findByIdAndDelete(genreId)
 
-  if (deletedGenre) {
-    res.status(200).send({
-      status: 200,
-      message: 'Genre deleted successfully',
-      data: deletedGenre
-    })
-  } else {
-    res.status(404).send({
-      status: 404,
-      message: `Genre with id ${genreId} does not exist.`,
+    if (deletedGenre) {
+      res.status(200).send({
+        status: 200,
+        message: 'Genre deleted successfully',
+        data: deletedGenre
+      })
+    } else {
+      res.status(404).send({
+        status: 404,
+        message: `Genre with id ${genreId} does not exist.`,
+        data: null
+      })
+    }
+  } catch (error) {
+    const { message, status } = parseError(error)
+    res.status(status).send({
+      status,
+      message,
       data: null
     })
   }
-
-  res.end()
 })
 
 module.exports = router

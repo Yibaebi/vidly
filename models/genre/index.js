@@ -1,25 +1,25 @@
 const Joi = require('joi')
-const mongoose = require('mongoose')
+const { Schema, model } = require('mongoose')
+
+const genreValidationSchema = Joi.object().keys({
+  title: Joi.string().min(3).max(50).required()
+})
+// Genre Schema
+const genreSchema = new Schema({
+  title: {
+    type: String,
+    required: true,
+    minlength: 3,
+    maxlength: 50
+  }
+})
 
 // Genre Model
-const Genre = mongoose.model(
-  'Genre',
-  new mongoose.Schema({
-    title: {
-      type: String,
-      required: true,
-      minlength: 3
-    }
-  })
-)
+const Genre = model('Genre', genreSchema)
 
 // Validation fn for a genre
 function validateGenre(genre) {
-  const schema = Joi.object({
-    title: Joi.string().min(3).required()
-  })
-
-  return schema.validate(genre)
+  return genreValidationSchema.validate(genre)
 }
 
-module.exports = { Genre, validateGenre }
+module.exports = { Genre, genreValidationSchema, genreSchema, validateGenre }

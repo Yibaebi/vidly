@@ -1,24 +1,24 @@
-const mongoose = require('mongoose')
 const Joi = require('joi')
+const { Schema, model } = require('mongoose')
+
+// Customer Schema
+const customerSchema = new Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  isGold: {
+    type: Boolean,
+    default: false
+  },
+  phone: {
+    type: String,
+    required: true
+  }
+})
 
 // Genre Model
-const Customer = mongoose.model(
-  'Customer',
-  new mongoose.Schema({
-    name: {
-      type: String,
-      required: true
-    },
-    isGold: {
-      type: Boolean,
-      default: false
-    },
-    phone: {
-      type: String,
-      required: true
-    }
-  })
-)
+const Customer = model('Customer', customerSchema)
 
 // Validation fn for customer req object
 function validateCustomer(customer, required = true) {
@@ -49,5 +49,6 @@ function validateCustomer(customer, required = true) {
 
 module.exports = {
   Customer,
+  customerSchema,
   validateCustomer
 }

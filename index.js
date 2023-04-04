@@ -3,6 +3,9 @@ const config = require('config')
 const mongoose = require('mongoose')
 const dbDebugger = require('debug')('app:db')
 
+const Joi = require('joi')
+Joi.objectId = require('joi-objectid')(Joi)
+
 const { logger, authenticator } = require('./middlewares')
 const { genres, customers, movies, rentals } = require('./routes')
 

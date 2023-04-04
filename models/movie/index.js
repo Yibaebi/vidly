@@ -39,7 +39,7 @@ function validateMovie(movie, required = true) {
       'string.empty': 'Title is not allowed to be empty.',
       'string.required': 'Title is a required field.'
     }),
-    genreId: Joi.string().required(),
+    genreId: Joi.objectId(),
     numberInStock: Joi.number().min(0).max(255),
     dailyRentalRate: Joi.number().min(0).max(255)
   })

@@ -35,8 +35,8 @@ const Rental = model('Rental', rentalSchema)
 // Validation fn for rental req object
 function validateRental(movie, required = true) {
   const schema = Joi.object({
-    customerId: Joi.string(),
-    movieId: Joi.string()
+    customerId: Joi.objectId(),
+    movieId: Joi.objectId()
   })
 
   const rentalSchema = required

@@ -63,18 +63,18 @@ router.post('/', async (req, res) => {
       })
     }
 
-    const genre = await Genre.findById(genreId).select('-__v')
+    const genre = await fetchMovieGenre(genreId)
 
-    if (!genre) {
+    if (genreId && !genre) {
       return res.status(404).send({
         status: 404,
         message: `Genre with ID - ${genreId} not found.`
       })
     }
 
-    let newMovie = new Movie({ ...req.body, genre })
+    const newMovie = new Movie({ ...req.body, genre })
 
-    newMovie = await newMovie.save()
+    await newMovie.save()
 
     res.status(200).send({
       status: 200,
@@ -101,9 +101,9 @@ router.put('/:id', async (req, res) => {
 
   try {
     const genreId = req.body.genreId
-    const genre = await Genre.findById(genreId).select('-__v')
+    const genre = await fetchMovieGenre(genreId)
 
-    if (!genre) {
+    if (genreId && !genre) {
       return res.status(404).send({
         status: 404,
         message: `Genre with ID - ${genreId} not found.`
@@ -111,25 +111,27 @@ router.put('/:id', async (req, res) => {
     }
 
     const movieId = req.params.id
+    const movieUpdates = genre ? { ...req.body, genre } : req.body
+
     const movie = await Movie.findByIdAndUpdate(
       movieId,
-      { $set: { ...req.body, genre } },
+      { $set: movieUpdates },
       { new: true }
     )
 
-    if (movie) {
-      res.status(200).send({
-        status: 200,
-        message: 'Movie updated successfully!',
-        data: movie
-      })
-    } else {
-      res.status(404).send({
+    if (!movie) {
+      return res.status(404).send({
         status: 404,
         message: `Movie with ID - ${movieId} does not exists.`,
         data: null
       })
     }
+
+    res.status(200).send({
+      status: 200,
+      message: 'Movie updated successfully!',
+      data: movie
+    })
   } catch (error) {
     const errorObj = parseError(error)
     res
@@ -163,5 +165,9 @@ router.delete('/:id', async (req, res) => {
     res.status(rest.status).send(rest)
   }
 })
+
+async function fetchMovieGenre(genreId) {
+  return genreId ? await Genre.findOne({ _id: genreId }).select('-__v') : null
+}
 
 module.exports = router

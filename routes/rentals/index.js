@@ -98,12 +98,12 @@ router.post('/', async (req, res) => {
 
     session.startTransaction()
 
-    let rental = new Rental({
+    const rental = new Rental({
       customer,
       movie
     })
 
-    rental = await rental.save({ session })
+    await rental.save({ session })
 
     movie.numberInStock--
     await movie.save({ session })

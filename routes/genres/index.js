@@ -65,11 +65,11 @@ router.post('/', async (req, res) => {
     })
   }
 
-  let newGenre = new Genre({
+  const newGenre = new Genre({
     title: newGenreTitle
   })
 
-  newGenre = await newGenre.save()
+  await newGenre.save()
 
   res.status(200).send({
     status: 200,

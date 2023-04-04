@@ -55,8 +55,9 @@ router.post('/', async (req, res) => {
     })
   }
 
-  let customer = new Customer(newCustomer)
-  customer = await customer.save()
+  const customer = new Customer(newCustomer)
+
+  await customer.save()
 
   res.send({
     status: 200,

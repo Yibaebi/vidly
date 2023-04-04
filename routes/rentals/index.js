@@ -1,4 +1,5 @@
 const express = require('express')
+const mongoose = require('mongoose')
 
 const { parseError } = require('../../utils')
 const { Rental, validateRental, Customer, Movie } = require('../../models')
@@ -46,6 +47,8 @@ router.post('/', async (req, res) => {
     })
   }
 
+  const session = await mongoose.startSession()
+
   try {
     const customerId = req.body.customerId
     const movieId = req.body.movieId
@@ -61,9 +64,7 @@ router.post('/', async (req, res) => {
       })
     }
 
-    const movie = await Movie.findById(movieId).select(
-      'title dailyRentalRate numberInStock'
-    )
+    const movie = await Movie.findById(movieId)
 
     if (!movie) {
       return res.status(404).send({
@@ -95,15 +96,19 @@ router.post('/', async (req, res) => {
       })
     }
 
+    session.startTransaction()
+
     let rental = new Rental({
       customer,
       movie
     })
 
-    rental = await rental.save()
+    rental = await rental.save({ session })
 
     movie.numberInStock--
-    await movie.save()
+    await movie.save({ session })
+
+    await session.commitTransaction()
 
     res.status(200).send({
       status: 200,
@@ -114,6 +119,8 @@ router.post('/', async (req, res) => {
     const errorObj = parseError(error)
     res.status(errorObj.status).send(errorObj)
   }
+
+  session.endSession()
 })
 
 module.exports = router

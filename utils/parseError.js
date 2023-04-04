@@ -1,8 +1,8 @@
 const parseError = (error) => {
   // Default error object
   const errorObject = {
-    status: 400,
-    message: 'An unexpected error occured',
+    status: 500,
+    message: 'Internal server error.',
     data: null,
     error
   }

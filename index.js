@@ -7,7 +7,7 @@ const Joi = require('joi')
 Joi.objectId = require('joi-objectid')(Joi)
 
 const { logger, authenticator } = require('./middlewares')
-const { genres, customers, movies, rentals } = require('./routes')
+const { genres, customers, movies, rentals, users } = require('./routes')
 
 // Set up server
 const app = express()
@@ -28,6 +28,7 @@ app.use('/api/genres', genres)
 app.use('/api/customers', customers)
 app.use('/api/movies', movies)
 app.use('/api/rentals', rentals)
+app.use('/api/users', users)
 
 // Setup port
 const PORT = process.env.PORT || '3000'

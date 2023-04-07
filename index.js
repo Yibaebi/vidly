@@ -6,14 +6,18 @@ const dbDebugger = require('debug')('app:db')
 const Joi = require('joi')
 Joi.objectId = require('joi-objectid')(Joi)
 
-const { logger, authenticator } = require('./middlewares')
-const { genres, customers, movies, rentals, users } = require('./routes')
+const { logger } = require('./middlewares')
+const { genres, customers, movies, rentals, users, auth } = require('./routes')
+
+if (!config.get('jwtPrivateKey')) {
+  console.error('FATAL ERROR! "jwtPrivateKey" found.')
+  process.exit(1)
+}
 
 // Set up server
 const app = express()
 app.use(express.json())
 app.use(logger)
-app.use(authenticator)
 
 // Setup mongodb
 const MONGODB_URL = config.get('mongodbURL')
@@ -29,6 +33,7 @@ app.use('/api/customers', customers)
 app.use('/api/movies', movies)
 app.use('/api/rentals', rentals)
 app.use('/api/users', users)
+app.use('/api/auth', auth)
 
 // Setup port
 const PORT = process.env.PORT || '3000'

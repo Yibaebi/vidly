@@ -2,6 +2,7 @@ const express = require('express')
 
 const { Movie, validateMovie, Genre } = require('../../models')
 const { parseError } = require('../../utils')
+const { authenticator } = require('../../middlewares')
 
 // Setup router
 const router = express.Router()
@@ -35,7 +36,7 @@ router.get('/:id', async (req, res) => {
 })
 
 // Add a movie
-router.post('/', async (req, res) => {
+router.post('/', authenticator, async (req, res) => {
   const { error } = validateMovie(req.body)
 
   if (error) {
@@ -88,7 +89,7 @@ router.post('/', async (req, res) => {
 })
 
 // Update a movie
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticator, async (req, res) => {
   const { error } = validateMovie(req.body, false)
 
   if (error) {
@@ -141,7 +142,7 @@ router.put('/:id', async (req, res) => {
 })
 
 // Delete a movie
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticator, async (req, res) => {
   const movieId = req.params.id
 
   try {

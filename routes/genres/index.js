@@ -2,6 +2,7 @@ const express = require('express')
 
 const { Genre, validateGenre } = require('../../models')
 const { parseError } = require('../../utils')
+const { authenticator } = require('../../middlewares')
 
 // Setup router
 const router = express.Router()
@@ -39,7 +40,7 @@ router.get('/:id', async (req, res) => {
 })
 
 // Add a movie genre
-router.post('/', async (req, res) => {
+router.post('/', authenticator, async (req, res) => {
   const { error } = validateGenre(req.body)
 
   if (error) {
@@ -79,7 +80,7 @@ router.post('/', async (req, res) => {
 })
 
 // Update a movie genre
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticator, async (req, res) => {
   const genreId = req.params.id
 
   const { error } = validateGenre(req.body)
@@ -140,7 +141,7 @@ router.put('/:id', async (req, res) => {
 })
 
 // Delete a genre
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticator, async (req, res) => {
   const genreId = req.params.id
 
   try {

@@ -2,18 +2,19 @@ const express = require('express')
 
 const { Customer, validateCustomer } = require('../../models')
 const { parseError } = require('../../utils')
+const { authenticator } = require('../../middlewares')
 
 // Setup Router
 const router = express.Router()
 
 // Get all customers
-router.get('/', async (req, res) => {
+router.get('/', authenticator, async (req, res) => {
   const customers = await Customer.find().sort('name')
   res.send({ status: 200, data: customers, count: customers.length })
 })
 
 // Get a customer
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticator, async (req, res) => {
   const id = req.params.id
 
   try {
@@ -42,7 +43,7 @@ router.get('/:id', async (req, res) => {
 })
 
 // Create a customer
-router.post('/', async (req, res) => {
+router.post('/', authenticator, async (req, res) => {
   const newCustomer = req.body
 
   const { error } = validateCustomer(newCustomer)
@@ -67,7 +68,7 @@ router.post('/', async (req, res) => {
 })
 
 // Update a customer
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticator, async (req, res) => {
   const customerId = req.params.id
   const customer = req.body
 
@@ -115,7 +116,7 @@ router.put('/:id', async (req, res) => {
 })
 
 // Delete a customer
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticator, async (req, res) => {
   const customerId = req.params.id
 
   try {

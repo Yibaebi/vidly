@@ -1,3 +1,4 @@
 {
-  "mongodbURL": "mongodb://localhost/vidly"
+  "mongodbURL": "mongodb://localhost/vidly",
+  "jwtPrivateKey": ""
 }

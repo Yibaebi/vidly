@@ -1,3 +1,4 @@
 {
-  "mongodbURL": "mongodbURL"
+  "mongodbURL": "mongodbURL",
+  "jwtPrivateKey": "vidly_jwtPrivateKey"
 }

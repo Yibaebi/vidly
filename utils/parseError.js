@@ -3,8 +3,7 @@ const parseError = (error) => {
   const errorObject = {
     status: 500,
     message: 'Internal server error.',
-    data: null,
-    error
+    data: null
   }
 
   if (error.name === 'CastError') {

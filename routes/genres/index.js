@@ -1,7 +1,6 @@
 const express = require('express')
 
 const { Genre, validateGenre } = require('../../models')
-const { parseError } = require('../../utils')
 const { authenticator, admin } = require('../../middlewares')
 
 // Setup router
@@ -17,26 +16,17 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const id = req.params.id
 
-  try {
-    const genre = await Genre.findById(id)
+  const genre = await Genre.findById(id)
 
-    if (!genre) {
-      return res.status(404).send({
-        status: 404,
-        data: null,
-        message: `Genre with ID - ${id} not found.`
-      })
-    }
-
-    res.status(200).send({ status: 200, data: genre })
-  } catch (error) {
-    const { message, status } = parseError(error)
-    res.status(status).send({
-      status,
-      message,
-      data: null
+  if (!genre) {
+    return res.status(404).send({
+      status: 404,
+      data: null,
+      message: `Genre with ID - ${id} not found.`
     })
   }
+
+  res.status(200).send({ status: 200, data: genre })
 })
 
 // Add a movie genre
@@ -144,27 +134,18 @@ router.put('/:id', authenticator, async (req, res) => {
 router.delete('/:id', [authenticator, admin], async (req, res) => {
   const genreId = req.params.id
 
-  try {
-    const deletedGenre = await Genre.findByIdAndDelete(genreId)
+  const deletedGenre = await Genre.findByIdAndDelete(genreId)
 
-    if (deletedGenre) {
-      res.status(200).send({
-        status: 200,
-        message: 'Genre deleted successfully',
-        data: deletedGenre
-      })
-    } else {
-      res.status(404).send({
-        status: 404,
-        message: `Genre with id ${genreId} does not exist.`,
-        data: null
-      })
-    }
-  } catch (error) {
-    const { message, status } = parseError(error)
-    res.status(status).send({
-      status,
-      message,
+  if (deletedGenre) {
+    res.status(200).send({
+      status: 200,
+      message: 'Genre deleted successfully',
+      data: deletedGenre
+    })
+  } else {
+    res.status(404).send({
+      status: 404,
+      message: `Genre with id ${genreId} does not exist.`,
       data: null
     })
   }

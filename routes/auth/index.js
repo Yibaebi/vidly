@@ -2,7 +2,6 @@ const Joi = require('joi')
 const express = require('express')
 const bcrypt = require('bcrypt')
 
-const { parseError } = require('../../utils')
 const { User } = require('../../models')
 
 // Setup router
@@ -20,42 +19,34 @@ router.post('/', async (req, res) => {
     })
   }
 
-  try {
-    const user = await User.findOne({ email: req.body.email })
+  const user = await User.findOne({ email: req.body.email })
 
-    if (!user) {
-      return res.status(400).send({
-        status: 400,
-        message: 'Invalid email or password.',
-        data: null
-      })
-    }
-
-    //  Check if password is valid
-    const passwordIsValid = await bcrypt.compare(
-      req.body.password,
-      user.password
-    )
-
-    if (!passwordIsValid) {
-      return res.status(400).send({
-        status: 400,
-        message: 'Invalid email or password.',
-        data: null
-      })
-    }
-
-    const token = user.generateAuthToken()
-
-    return res.setHeader('x-auth-token', token).status(200).send({
-      status: 200,
-      message: 'Login successful.',
+  if (!user) {
+    return res.status(400).send({
+      status: 400,
+      message: 'Invalid email or password.',
       data: null
     })
-  } catch (error) {
-    const { error: _, ...rest } = parseError(error)
-    res.status(rest.status).send(rest)
   }
+
+  //  Check if password is valid
+  const passwordIsValid = await bcrypt.compare(req.body.password, user.password)
+
+  if (!passwordIsValid) {
+    return res.status(400).send({
+      status: 400,
+      message: 'Invalid email or password.',
+      data: null
+    })
+  }
+
+  const token = user.generateAuthToken()
+
+  return res.setHeader('x-auth-token', token).status(200).send({
+    status: 200,
+    message: 'Login successful.',
+    data: null
+  })
 })
 
 // Validation fn for user req object

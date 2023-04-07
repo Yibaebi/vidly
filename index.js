@@ -2,11 +2,12 @@ const express = require('express')
 const config = require('config')
 const mongoose = require('mongoose')
 const dbDebugger = require('debug')('app:db')
+require('express-async-errors')
 
 const Joi = require('joi')
 Joi.objectId = require('joi-objectid')(Joi)
 
-const { logger } = require('./middlewares')
+const { logger, error } = require('./middlewares')
 const { genres, customers, movies, rentals, users, auth } = require('./routes')
 
 if (!config.get('jwtPrivateKey')) {
@@ -34,6 +35,9 @@ app.use('/api/movies', movies)
 app.use('/api/rentals', rentals)
 app.use('/api/users', users)
 app.use('/api/auth', auth)
+
+// Error handler
+app.use(error)
 
 // Setup port
 const PORT = process.env.PORT || '3000'

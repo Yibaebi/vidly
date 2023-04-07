@@ -1,7 +1,6 @@
 const express = require('express')
 
 const { Movie, validateMovie, Genre } = require('../../models')
-const { parseError } = require('../../utils')
 const { authenticator } = require('../../middlewares')
 
 // Setup router
@@ -17,22 +16,17 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const id = req.params.id
 
-  try {
-    const genre = await Movie.findById(id)
+  const genre = await Movie.findById(id)
 
-    if (!genre) {
-      return res.status(404).send({
-        status: 404,
-        data: null,
-        message: `Movie with ID - ${id} not found.`
-      })
-    }
-
-    res.status(200).send({ status: 200, data: genre })
-  } catch (error) {
-    const { error: _, ...rest } = parseError(error)
-    res.status(rest.status).send(rest)
+  if (!genre) {
+    return res.status(404).send({
+      status: 404,
+      data: null,
+      message: `Movie with ID - ${id} not found.`
+    })
   }
+
+  res.status(200).send({ status: 200, data: genre })
 })
 
 // Add a movie
@@ -47,45 +41,40 @@ router.post('/', authenticator, async (req, res) => {
     })
   }
 
-  try {
-    const newMovieTitle = req.body.title
-    const genreId = req.body.genreId
+  const newMovieTitle = req.body.title
+  const genreId = req.body.genreId
 
-    const movieWithSameTitleAndGenre = await Movie.findOne({
-      title: newMovieTitle,
-      'genre._id': genreId
+  const movieWithSameTitleAndGenre = await Movie.findOne({
+    title: newMovieTitle,
+    'genre._id': genreId
+  })
+
+  if (movieWithSameTitleAndGenre) {
+    return res.status(409).send({
+      status: 409,
+      message: `Movie with title "${movieWithSameTitleAndGenre.title}" and genre with ID - "${movieWithSameTitleAndGenre.genre.id}" already exists.`,
+      data: null
     })
-
-    if (movieWithSameTitleAndGenre) {
-      return res.status(409).send({
-        status: 409,
-        message: `Movie with title "${movieWithSameTitleAndGenre.title}" and genre with ID - "${movieWithSameTitleAndGenre.genre.id}" already exists.`,
-        data: null
-      })
-    }
-
-    const genre = await fetchMovieGenre(genreId)
-
-    if (genreId && !genre) {
-      return res.status(404).send({
-        status: 404,
-        message: `Genre with ID - ${genreId} not found.`
-      })
-    }
-
-    const newMovie = new Movie({ ...req.body, genre })
-
-    await newMovie.save()
-
-    res.status(200).send({
-      status: 200,
-      message: 'Movie created successfully.',
-      data: newMovie
-    })
-  } catch (error) {
-    const { error: _, ...rest } = parseError(error)
-    res.status(rest.status).send(rest)
   }
+
+  const genre = await fetchMovieGenre(genreId)
+
+  if (genreId && !genre) {
+    return res.status(404).send({
+      status: 404,
+      message: `Genre with ID - ${genreId} not found.`
+    })
+  }
+
+  const newMovie = new Movie({ ...req.body, genre })
+
+  await newMovie.save()
+
+  res.status(200).send({
+    status: 200,
+    message: 'Movie created successfully.',
+    data: newMovie
+  })
 })
 
 // Update a movie
@@ -100,70 +89,58 @@ router.put('/:id', authenticator, async (req, res) => {
     })
   }
 
-  try {
-    const genreId = req.body.genreId
-    const genre = await fetchMovieGenre(genreId)
+  const genreId = req.body.genreId
+  const genre = await fetchMovieGenre(genreId)
 
-    if (genreId && !genre) {
-      return res.status(404).send({
-        status: 404,
-        message: `Genre with ID - ${genreId} not found.`
-      })
-    }
-
-    const movieId = req.params.id
-    const movieUpdates = genre ? { ...req.body, genre } : req.body
-
-    const movie = await Movie.findByIdAndUpdate(
-      movieId,
-      { $set: movieUpdates },
-      { new: true }
-    )
-
-    if (!movie) {
-      return res.status(404).send({
-        status: 404,
-        message: `Movie with ID - ${movieId} does not exists.`,
-        data: null
-      })
-    }
-
-    res.status(200).send({
-      status: 200,
-      message: 'Movie updated successfully!',
-      data: movie
+  if (genreId && !genre) {
+    return res.status(404).send({
+      status: 404,
+      message: `Genre with ID - ${genreId} not found.`
     })
-  } catch (error) {
-    const errorObj = parseError(error)
-    res
-      .status(errorObj.status)
-      .send({ ...errorObj, error: errorObj.error.message })
   }
+
+  const movieId = req.params.id
+  const movieUpdates = genre ? { ...req.body, genre } : req.body
+
+  const movie = await Movie.findByIdAndUpdate(
+    movieId,
+    { $set: movieUpdates },
+    { new: true }
+  )
+
+  if (!movie) {
+    return res.status(404).send({
+      status: 404,
+      message: `Movie with ID - ${movieId} does not exists.`,
+      data: null
+    })
+  }
+
+  res.status(200).send({
+    status: 200,
+    message: 'Movie updated successfully!',
+    data: movie
+  })
 })
 
 // Delete a movie
 router.delete('/:id', authenticator, async (req, res) => {
   const movieId = req.params.id
 
-  try {
-    const deletedMovie = await Movie.findByIdAndDelete(movieId)
+  const deletedMovie = await Movie.findByIdAndDelete(movieId)
 
-    if (deletedMovie) {
-      res.status(200).send({
-        status: 200,
-        message: 'Movie deleted successfully',
-        data: deletedMovie
-      })
-    } else {
-      res.status(404).send({
-        status: 404,
-        message: `Movie with id ${movieId} does not exist.`,
-        data: null
-      })
-    }
-  } catch (error) {
-    const { error: _, ...rest } = parseError(error)
-    res.status(rest.status).send(rest)
+  if (deletedMovie) {
+    res.status(200).send({
+      status: 200,
+      message: 'Movie deleted successfully',
+      data: deletedMovie
+    })
+  } else {
+    res.status(404).send({
+      status: 404,
+      message: `Movie with id ${movieId} does not exist.`,
+      data: null
+    })
   }
 })
 

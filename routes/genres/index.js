@@ -2,7 +2,7 @@ const express = require('express')
 
 const { Genre, validateGenre } = require('../../models')
 const { parseError } = require('../../utils')
-const { authenticator } = require('../../middlewares')
+const { authenticator, admin } = require('../../middlewares')
 
 // Setup router
 const router = express.Router()
@@ -141,7 +141,7 @@ router.put('/:id', authenticator, async (req, res) => {
 })
 
 // Delete a genre
-router.delete('/:id', authenticator, async (req, res) => {
+router.delete('/:id', [authenticator, admin], async (req, res) => {
   const genreId = req.params.id
 
   try {

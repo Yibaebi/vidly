@@ -29,12 +29,13 @@ const userSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  isAdmin: Boolean
 })
 
 userSchema.methods.generateAuthToken = function () {
   const jwtPrivateKey = config.get('jwtPrivateKey')
-  const token = jwt.sign({ _id: this._id }, jwtPrivateKey)
+  const token = jwt.sign({ _id: this._id, isAdmin: this.isAdmin }, jwtPrivateKey)
 
   return token
 }

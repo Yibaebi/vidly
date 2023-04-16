@@ -7,18 +7,17 @@ require('express-async-errors')
 const Joi = require('joi')
 Joi.objectId = require('joi-objectid')(Joi)
 
-const { logger, error } = require('./middlewares')
+const { error } = require('./middlewares')
 const { genres, customers, movies, rentals, users, auth } = require('./routes')
 
 if (!config.get('jwtPrivateKey')) {
-  console.error('FATAL ERROR! "jwtPrivateKey" found.')
+  console.error('FATAL ERROR! "jwtPrivateKey" not found.')
   process.exit(1)
 }
 
 // Set up server
 const app = express()
 app.use(express.json())
-app.use(logger)
 
 // Setup mongodb
 const MONGODB_URL = config.get('mongodbURL')

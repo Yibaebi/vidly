@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const id = req.params.id
 
-  const genre = await Genre.findById(id)
+  const genre = await Genre.findById(id).select('-__v')
 
   if (!genre) {
     return res.status(404).send({
@@ -126,8 +126,6 @@ router.put('/:id', authenticator, async (req, res) => {
       data: null
     })
   }
-
-  res.end()
 })
 
 // Delete a genre

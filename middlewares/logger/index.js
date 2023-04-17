@@ -1,5 +1,5 @@
 const { format, createLogger, transports } = require('winston')
-const { combine, errors, timestamp } = format
+const { combine, errors, timestamp, colorize } = format
 
 // Default log config
 const DIRNAME = './logs'
@@ -13,6 +13,7 @@ const readableLogFormat = format.printf(
 const DEFAULT_LOG_FORMAT = combine(
   errors({ stack: false }),
   timestamp(),
+  combine(colorize({ level: true })),
   readableLogFormat
 )
 
@@ -25,7 +26,7 @@ const GEN_CONFIG = {
 const logger = createLogger({
   format: DEFAULT_LOG_FORMAT,
   transports: [
-    new transports.Console({ level: 'error' }),
+    new transports.Console({ level: 'info' }),
     new transports.File({ filename: 'error', level: 'error', ...GEN_CONFIG })
   ],
   exceptionHandlers: [

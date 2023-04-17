@@ -1,43 +1,22 @@
 const express = require('express')
-const config = require('config')
-const mongoose = require('mongoose')
-const dbDebugger = require('debug')('app:db')
-require('express-async-errors')
+const { routes, db, config, validation } = require('./startup')
+const { logger } = require('./middlewares')
 
-const Joi = require('joi')
-Joi.objectId = require('joi-objectid')(Joi)
-
-const { error } = require('./middlewares')
-const { genres, customers, movies, rentals, users, auth } = require('./routes')
-
-if (!config.get('jwtPrivateKey')) {
-  console.error('FATAL ERROR! "jwtPrivateKey" not found.')
-  process.exit(1)
-}
-
-// Set up server
+// Setup server
 const app = express()
-app.use(express.json())
 
-// Setup mongodb
-const MONGODB_URL = config.get('mongodbURL')
+// Setup app validation
+validation()
 
-mongoose
-  .connect(MONGODB_URL)
-  .then(() => dbDebugger('Connected to MongoDB...'))
-  .catch((err) => console.error(err))
+// Setup app config
+config()
 
-// Routes
-app.use('/api/genres', genres)
-app.use('/api/customers', customers)
-app.use('/api/movies', movies)
-app.use('/api/rentals', rentals)
-app.use('/api/users', users)
-app.use('/api/auth', auth)
+// Setup app routes
+routes(app)
 
-// Error handler
-app.use(error)
+// DB setup
+db()
 
 // Setup port
 const PORT = process.env.PORT || '3000'
-app.listen(PORT, () => console.log(`Listening on port ${PORT}...`))
+app.listen(PORT, () => logger.info(`Listening on port ${PORT}...`))

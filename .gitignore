@@ -1,4 +1,5 @@
 /node_modules
+/.vscode
 
 # Error logs
 /logs

@@ -35,7 +35,10 @@ const userSchema = new Schema({
 
 userSchema.methods.generateAuthToken = function () {
   const jwtPrivateKey = config.get('jwtPrivateKey')
-  const token = jwt.sign({ _id: this._id, isAdmin: this.isAdmin }, jwtPrivateKey)
+  const token = jwt.sign(
+    { _id: this._id, isAdmin: this.isAdmin },
+    jwtPrivateKey
+  )
 
   return token
 }
@@ -48,7 +51,7 @@ function validateUser(user) {
   const schema = Joi.object({
     name: Joi.string().required().messages({
       'string.empty': 'name is not allowed to be empty.',
-      'string.required': 'name is a required field.'
+      'any.required': 'name is a required field.'
     }),
     email: Joi.string().email().required(),
     password: Joi.string().min(5).max(255).required()

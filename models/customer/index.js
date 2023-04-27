@@ -17,7 +17,7 @@ const customerSchema = new Schema({
   }
 })
 
-// Genre Model
+// Customer Model
 const Customer = model('Customer', customerSchema)
 
 // Validation fn for customer req object

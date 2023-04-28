@@ -1,6 +1,6 @@
 const config = require('config')
-const { logger } = require('../../middlewares')
 const mongoose = require('mongoose')
+const { logger } = require('../../middlewares')
 
 module.exports = function () {
   // Setup mongodb
@@ -8,5 +8,5 @@ module.exports = function () {
 
   mongoose
     .connect(MONGODB_URL)
-    .then(() => logger.info('Connected to MongoDB...'))
+    .then(() => logger.info(`Connected to ${MONGODB_URL}...`))
 }

@@ -1,7 +1,8 @@
 const express = require('express')
 
 const { Genre, validateGenre } = require('../../models')
-const { authenticator, admin } = require('../../middlewares')
+const { authenticator, validateObjectId } = require('../../middlewares')
+const { ERROR_CODES } = require('../../constants')
 
 // Setup router
 const router = express.Router()
@@ -9,24 +10,26 @@ const router = express.Router()
 // Get all movie genres
 router.get('/', async (req, res) => {
   const genres = await Genre.find()
-  res.status(200).send({ status: 200, data: genres, count: genres.length })
+  res
+    .status(ERROR_CODES.OK)
+    .send({ status: ERROR_CODES.OK, data: genres, count: genres.length })
 })
 
 // Get a movie genre
-router.get('/:id', async (req, res) => {
+router.get('/:id', validateObjectId, async (req, res) => {
   const id = req.params.id
 
   const genre = await Genre.findById(id).select('-__v')
 
   if (!genre) {
-    return res.status(404).send({
-      status: 404,
+    return res.status(ERROR_CODES.NOT_FOUND).send({
+      status: ERROR_CODES.NOT_FOUND,
       data: null,
       message: `Genre with ID - ${id} not found.`
     })
   }
 
-  res.status(200).send({ status: 200, data: genre })
+  res.status(ERROR_CODES.OK).send({ status: ERROR_CODES.OK, data: genre })
 })
 
 // Add a movie genre
@@ -34,8 +37,8 @@ router.post('/', authenticator, async (req, res) => {
   const { error } = validateGenre(req.body)
 
   if (error) {
-    return res.status(400).send({
-      status: 400,
+    return res.status(ERROR_CODES.BAD_REQUEST).send({
+      status: ERROR_CODES.BAD_REQUEST,
       message: error.details[0].message.replaceAll('"', ''),
       data: null
     })
@@ -49,8 +52,8 @@ router.post('/', authenticator, async (req, res) => {
   })
 
   if (genre) {
-    return res.status(409).send({
-      status: 409,
+    return res.status(ERROR_CODES.CONFLICT).send({
+      status: ERROR_CODES.CONFLICT,
       message: `Genre with title ${genre.title} already exists.`,
       data: null
     })
@@ -62,8 +65,8 @@ router.post('/', authenticator, async (req, res) => {
 
   await newGenre.save()
 
-  res.status(200).send({
-    status: 200,
+  res.status(ERROR_CODES.OK).send({
+    status: ERROR_CODES.OK,
     message: 'Genre added successfully.',
     data: newGenre
   })
@@ -76,8 +79,8 @@ router.put('/:id', authenticator, async (req, res) => {
   const { error } = validateGenre(req.body)
 
   if (error) {
-    return res.status(400).send({
-      status: 400,
+    return res.status(ERROR_CODES.BAD_REQUEST).send({
+      status: ERROR_CODES.BAD_REQUEST,
       message: error.details[0].message.replaceAll('"', ''),
       data: null
     })
@@ -91,8 +94,8 @@ router.put('/:id', authenticator, async (req, res) => {
     const titlePattern = new RegExp(newGenreTitle.trim(), 'i')
 
     if (genre.title.match(titlePattern)) {
-      return res.status(409).send({
-        status: 409,
+      return res.status(ERROR_CODES.CONFLICT).send({
+        status: ERROR_CODES.CONFLICT,
         message: 'Cannot update genre with the same title.'
       })
     }
@@ -104,8 +107,8 @@ router.put('/:id', authenticator, async (req, res) => {
     })
 
     if (genreWithTitle) {
-      return res.status(409).send({
-        status: 409,
+      return res.status(ERROR_CODES.CONFLICT).send({
+        status: ERROR_CODES.CONFLICT,
         message: `A genre with title ${genreWithTitle.title} already exists. Cannot perform update.`,
         data: null
       })
@@ -113,15 +116,15 @@ router.put('/:id', authenticator, async (req, res) => {
       genre.title = newGenreTitle
       const updatedGenre = await genre.save()
 
-      res.status(200).send({
-        status: 200,
+      res.status(ERROR_CODES.OK).send({
+        status: ERROR_CODES.OK,
         message: 'Genre updated successfully!',
         data: updatedGenre
       })
     }
   } else {
-    res.status(404).send({
-      status: 404,
+    res.status(ERROR_CODES.NOT_FOUND).send({
+      status: ERROR_CODES.NOT_FOUND,
       message: `Genre with ID - ${genreId} does not exists.`,
       data: null
     })
@@ -129,20 +132,20 @@ router.put('/:id', authenticator, async (req, res) => {
 })
 
 // Delete a genre
-router.delete('/:id', [authenticator, admin], async (req, res) => {
+router.delete('/:id', authenticator, async (req, res) => {
   const genreId = req.params.id
 
   const deletedGenre = await Genre.findByIdAndDelete(genreId)
 
   if (deletedGenre) {
-    res.status(200).send({
-      status: 200,
+    res.status(ERROR_CODES.OK).send({
+      status: ERROR_CODES.OK,
       message: 'Genre deleted successfully',
       data: deletedGenre
     })
   } else {
-    res.status(404).send({
-      status: 404,
+    res.status(ERROR_CODES.NOT_FOUND).send({
+      status: ERROR_CODES.NOT_FOUND,
       message: `Genre with id ${genreId} does not exist.`,
       data: null
     })

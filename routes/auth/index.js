@@ -3,6 +3,7 @@ const express = require('express')
 const bcrypt = require('bcrypt')
 
 const { User } = require('../../models')
+const { ERROR_CODES } = require('../../constants')
 
 // Setup router
 const router = express.Router()
@@ -12,8 +13,8 @@ router.post('/', async (req, res) => {
   const { error } = validateUser(req.body)
 
   if (error) {
-    return res.status(400).send({
-      status: 400,
+    return res.status(ERROR_CODES.BAD_REQUEST).send({
+      status: ERROR_CODES.BAD_REQUEST,
       message: error.details[0].message.replaceAll('"', ''),
       data: null
     })
@@ -22,8 +23,8 @@ router.post('/', async (req, res) => {
   const user = await User.findOne({ email: req.body.email })
 
   if (!user) {
-    return res.status(400).send({
-      status: 400,
+    return res.status(ERROR_CODES.BAD_REQUEST).send({
+      status: ERROR_CODES.BAD_REQUEST,
       message: 'Invalid email or password.',
       data: null
     })
@@ -33,8 +34,8 @@ router.post('/', async (req, res) => {
   const passwordIsValid = await bcrypt.compare(req.body.password, user.password)
 
   if (!passwordIsValid) {
-    return res.status(400).send({
-      status: 400,
+    return res.status(ERROR_CODES.BAD_REQUEST).send({
+      status: ERROR_CODES.BAD_REQUEST,
       message: 'Invalid email or password.',
       data: null
     })
@@ -42,8 +43,8 @@ router.post('/', async (req, res) => {
 
   const token = user.generateAuthToken()
 
-  return res.setHeader('x-auth-token', token).status(200).send({
-    status: 200,
+  return res.setHeader('x-auth-token', token).status(ERROR_CODES.OK).send({
+    status: ERROR_CODES.OK,
     message: 'Login successful.',
     data: null
   })

@@ -4,6 +4,7 @@ const _ = require('lodash')
 
 const { validateUser, User } = require('../../models')
 const { authenticator } = require('../../middlewares')
+const { ERROR_CODES } = require('../../constants')
 
 // Setup router
 const router = express.Router()
@@ -16,15 +17,16 @@ router.get('/me', authenticator, async (req, res, next) => {
 
   if (user) {
     return res.send({
-      status: 200,
+      status: ERROR_CODES.OK,
       data: _.pick(user, ['name', 'email', 'createdAt', '_id']),
       message: 'User found successfully.'
     })
   }
 
-  res
-    .status(404)
-    .send({ status: 200, message: `User with ID - ${id} not found.` })
+  res.status(ERROR_CODES.NOT_FOUND).send({
+    status: ERROR_CODES.OK,
+    message: `User with ID - ${id} not found.`
+  })
 })
 
 // Add a user
@@ -32,8 +34,8 @@ router.post('/', async (req, res) => {
   const { error } = validateUser(req.body)
 
   if (error) {
-    return res.status(400).send({
-      status: 400,
+    return res.status(ERROR_CODES.BAD_REQUEST).send({
+      status: ERROR_CODES.BAD_REQUEST,
       message: error.details[0].message.replaceAll('"', ''),
       data: null
     })
@@ -42,8 +44,8 @@ router.post('/', async (req, res) => {
   const userWithSameEmail = await User.findOne({ email: req.body.email })
 
   if (userWithSameEmail) {
-    return res.status(400).send({
-      status: 400,
+    return res.status(ERROR_CODES.BAD_REQUEST).send({
+      status: ERROR_CODES.BAD_REQUEST,
       message: 'User already registered.',
       data: null
     })
@@ -60,8 +62,8 @@ router.post('/', async (req, res) => {
 
   newUser = _.pick(newUser, ['name', 'email', '_id', 'createdAt'])
 
-  res.setHeader('x-auth-token', token).status(200).send({
-    status: 200,
+  res.setHeader('x-auth-token', token).status(ERROR_CODES.OK).send({
+    status: ERROR_CODES.OK,
     message: 'User created successfully.',
     data: newUser
   })

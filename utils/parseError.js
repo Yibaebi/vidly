@@ -1,14 +1,11 @@
+const { ERROR_CODES } = require('../constants')
+
 const parseError = (error) => {
   // Default error object
   const errorObject = {
-    status: 500,
+    status: ERROR_CODES.INTERNAL_SERVER_ERROR,
     message: 'Internal server error.',
     data: null
-  }
-
-  if (error.name === 'CastError') {
-    errorObject.message = 'Invalid request ID.'
-    errorObject.status = 400
   }
 
   if (error.name === 'ValidationError') {

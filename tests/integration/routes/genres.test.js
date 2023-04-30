@@ -8,8 +8,8 @@ describe('Integration | routes/genres', () => {
   const AGENT = request(server)
 
   afterEach(async () => {
-    server.close()
     await Genre.deleteMany({})
+    await server.close()
   })
 
   describe('GET /', () => {

@@ -5,8 +5,8 @@ const { User, Customer } = require('../../../models')
 
 describe('Integration | middleware/admin', () => {
   afterEach(async () => {
-    server.close()
     await Customer.deleteMany({})
+    await server.close()
   })
 
   it('throws an 403 if user is not an admin', async () => {

@@ -2,8 +2,9 @@ const { authenticator } = require('../../../middlewares')
 const { User } = require('../../../models')
 
 describe('Unit | middleware/authenticator', () => {
-  it('authorizes user if token is valid', async () => {
-    const token = new User({ isAdmin: true }).generateAuthToken()
+  it('authorizes user and populates req.user with JWT payload', async () => {
+    const user = new User({ isAdmin: true })
+    const token = user.generateAuthToken()
 
     const req = {
       headers: {
@@ -15,6 +16,8 @@ describe('Unit | middleware/authenticator', () => {
 
     authenticator(req, res, next)
 
+    expect(req.user).toBeDefined()
+    expect(req.user).toHaveProperty('isAdmin', user.isAdmin)
     expect(next).toHaveBeenCalled()
   })
 })

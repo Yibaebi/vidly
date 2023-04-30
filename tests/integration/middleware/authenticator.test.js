@@ -5,8 +5,8 @@ const { Customer } = require('../../../models')
 
 describe('Integration | middleware/authenticator', () => {
   afterEach(async () => {
-    server.close()
     await Customer.deleteMany({})
+    await server.close()
   })
 
   it('returns a 401 if token is empty', async () => {

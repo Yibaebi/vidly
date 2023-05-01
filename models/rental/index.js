@@ -1,4 +1,5 @@
 const Joi = require('joi')
+const dayjs = require('dayjs')
 const { model, Schema } = require('mongoose')
 
 const { customerSchema } = require('../customer')
@@ -27,6 +28,24 @@ const rentalSchema = new Schema({
   dateOut: { type: Date, default: Date.now, required: true },
   dateReturned: { type: Date },
   rentalFee: { type: Number, min: 0 }
+})
+
+// returning a particular rental
+rentalSchema.static('lookup', function (movieId, customerId) {
+  return this.findOne({
+    'movie._id': movieId,
+    'customer._id': customerId
+  })
+})
+
+// process a return
+rentalSchema.method('return', function () {
+  this.set('dateReturned', Date.now())
+
+  const totalDaysOut = dayjs(this.dateReturned).diff(this.dateOut, 'days')
+  const rentalFee = totalDaysOut * this.movie.dailyRentalRate
+
+  this.set('rentalFee', rentalFee)
 })
 
 // Rental Model

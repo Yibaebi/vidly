@@ -4,7 +4,7 @@ const _ = require('lodash')
 
 const { validateUser, User } = require('../../models')
 const { authenticator } = require('../../middlewares')
-const { ERROR_CODES } = require('../../constants')
+const { RESPONSE_CODES } = require('../../constants')
 
 // Setup router
 const router = express.Router()
@@ -17,14 +17,14 @@ router.get('/me', authenticator, async (req, res, next) => {
 
   if (user) {
     return res.send({
-      status: ERROR_CODES.OK,
+      status: RESPONSE_CODES.OK,
       data: _.pick(user, ['name', 'email', 'createdAt', '_id']),
       message: 'User found successfully.'
     })
   }
 
-  res.status(ERROR_CODES.NOT_FOUND).send({
-    status: ERROR_CODES.OK,
+  res.status(RESPONSE_CODES.NOT_FOUND).send({
+    status: RESPONSE_CODES.OK,
     message: `User with ID - ${id} not found.`
   })
 })
@@ -34,8 +34,8 @@ router.post('/', async (req, res) => {
   const { error } = validateUser(req.body)
 
   if (error) {
-    return res.status(ERROR_CODES.BAD_REQUEST).send({
-      status: ERROR_CODES.BAD_REQUEST,
+    return res.status(RESPONSE_CODES.BAD_REQUEST).send({
+      status: RESPONSE_CODES.BAD_REQUEST,
       message: error.details[0].message.replaceAll('"', ''),
       data: null
     })
@@ -44,8 +44,8 @@ router.post('/', async (req, res) => {
   const userWithSameEmail = await User.findOne({ email: req.body.email })
 
   if (userWithSameEmail) {
-    return res.status(ERROR_CODES.BAD_REQUEST).send({
-      status: ERROR_CODES.BAD_REQUEST,
+    return res.status(RESPONSE_CODES.BAD_REQUEST).send({
+      status: RESPONSE_CODES.BAD_REQUEST,
       message: 'User already registered.',
       data: null
     })
@@ -62,8 +62,8 @@ router.post('/', async (req, res) => {
 
   newUser = _.pick(newUser, ['name', 'email', '_id', 'createdAt'])
 
-  res.setHeader('x-auth-token', token).status(ERROR_CODES.OK).send({
-    status: ERROR_CODES.OK,
+  res.setHeader('x-auth-token', token).send({
+    status: RESPONSE_CODES.OK,
     message: 'User created successfully.',
     data: newUser
   })

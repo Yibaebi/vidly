@@ -1,6 +1,6 @@
 const request = require('supertest')
 const server = require('../../../')
-const { ERROR_CODES } = require('../../../constants')
+const { RESPONSE_CODES } = require('../../../constants')
 const { User, Customer } = require('../../../models')
 
 describe('Integration | middleware/admin', () => {
@@ -20,6 +20,6 @@ describe('Integration | middleware/admin', () => {
       .delete(`/api/customers/${customer.id}`)
       .set('x-auth-token', token)
 
-    expect(response.status).toBe(ERROR_CODES.FORBIDDEN)
+    expect(response.status).toBe(RESPONSE_CODES.FORBIDDEN)
   })
 })

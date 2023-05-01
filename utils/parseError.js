@@ -1,9 +1,9 @@
-const { ERROR_CODES } = require('../constants')
+const { RESPONSE_CODES } = require('../constants')
 
 const parseError = (error) => {
   // Default error object
   const errorObject = {
-    status: ERROR_CODES.INTERNAL_SERVER_ERROR,
+    status: RESPONSE_CODES.INTERNAL_SERVER_ERROR,
     message: 'Internal server error.',
     data: null
   }

@@ -1,6 +1,6 @@
 const request = require('supertest')
 const server = require('../../../')
-const { ERROR_CODES } = require('../../../constants')
+const { RESPONSE_CODES } = require('../../../constants')
 const { Customer } = require('../../../models')
 
 describe('Integration | middleware/authenticator', () => {
@@ -14,7 +14,7 @@ describe('Integration | middleware/authenticator', () => {
       .get('/api/customers')
       .set('x-auth-token', '')
 
-    expect(response.status).toBe(ERROR_CODES.UNAUTHORIZED)
+    expect(response.status).toBe(RESPONSE_CODES.UNAUTHORIZED)
   })
 
   it('returns a 401 if token is invalid', async () => {
@@ -22,6 +22,6 @@ describe('Integration | middleware/authenticator', () => {
       .get('/api/customers')
       .set('x-auth-token', '1')
 
-    expect(response.status).toBe(ERROR_CODES.UNAUTHORIZED)
+    expect(response.status).toBe(RESPONSE_CODES.UNAUTHORIZED)
   })
 })

@@ -2,7 +2,7 @@ const express = require('express')
 
 const { Customer, validateCustomer } = require('../../models')
 const { authenticator, validateObjectId, admin } = require('../../middlewares')
-const { ERROR_CODES } = require('../../constants')
+const { RESPONSE_CODES } = require('../../constants')
 
 // Setup Router
 const router = express.Router()
@@ -10,7 +10,11 @@ const router = express.Router()
 // Get all customers
 router.get('/', authenticator, async (req, res) => {
   const customers = await Customer.find().sort('name')
-  res.send({ status: ERROR_CODES.OK, data: customers, count: customers.length })
+  res.send({
+    status: RESPONSE_CODES.OK,
+    data: customers,
+    count: customers.length
+  })
 })
 
 // Get a customer
@@ -21,14 +25,14 @@ router.get('/:id', [validateObjectId, authenticator], async (req, res) => {
 
   if (customer) {
     return res.send({
-      status: ERROR_CODES.OK,
+      status: RESPONSE_CODES.OK,
       data: customer,
       message: 'Customer found successfully.'
     })
   }
 
-  res.status(ERROR_CODES.NOT_FOUND).send({
-    status: ERROR_CODES.OK,
+  res.status(RESPONSE_CODES.NOT_FOUND).send({
+    status: RESPONSE_CODES.OK,
     message: `Customer with ID - ${id} not found.`
   })
 })
@@ -40,8 +44,8 @@ router.post('/', authenticator, async (req, res) => {
   const { error } = validateCustomer(newCustomer)
 
   if (error) {
-    return res.status(ERROR_CODES.BAD_REQUEST).send({
-      status: ERROR_CODES.BAD_REQUEST,
+    return res.status(RESPONSE_CODES.BAD_REQUEST).send({
+      status: RESPONSE_CODES.BAD_REQUEST,
       error: error.message.replaceAll('"', ''),
       data: null
     })
@@ -52,7 +56,7 @@ router.post('/', authenticator, async (req, res) => {
   await customer.save()
 
   res.send({
-    status: ERROR_CODES.OK,
+    status: RESPONSE_CODES.OK,
     message: 'Customer created successfully',
     data: customer
   })
@@ -66,8 +70,8 @@ router.put('/:id', authenticator, async (req, res) => {
   const { error } = validateCustomer(customer, false)
 
   if (error) {
-    return res.status(ERROR_CODES.BAD_REQUEST).send({
-      status: ERROR_CODES.BAD_REQUEST,
+    return res.status(RESPONSE_CODES.BAD_REQUEST).send({
+      status: RESPONSE_CODES.BAD_REQUEST,
       error: error.message.replaceAll('"', ''),
       data: null
     })
@@ -83,14 +87,14 @@ router.put('/:id', authenticator, async (req, res) => {
 
   if (updatedCustomer) {
     return res.send({
-      status: ERROR_CODES.OK,
+      status: RESPONSE_CODES.OK,
       message: `Customer with - ${customerId} has been updated successfully.`,
       data: updatedCustomer
     })
   }
 
-  res.status(ERROR_CODES.NOT_FOUND).send({
-    status: ERROR_CODES.NOT_FOUND,
+  res.status(RESPONSE_CODES.NOT_FOUND).send({
+    status: RESPONSE_CODES.NOT_FOUND,
     message: `Customer with ID - ${customerId} not found.`,
     data: updatedCustomer
   })
@@ -107,14 +111,14 @@ router.delete(
 
     if (deletedCustomer) {
       return res.send({
-        status: ERROR_CODES.OK,
+        status: RESPONSE_CODES.OK,
         message: `Customer withd ID - ${customerId} has been deleted successfully.`,
         data: deletedCustomer
       })
     }
 
-    res.status(ERROR_CODES.NOT_FOUND).send({
-      status: ERROR_CODES.NOT_FOUND,
+    res.status(RESPONSE_CODES.NOT_FOUND).send({
+      status: RESPONSE_CODES.NOT_FOUND,
       message: `Customer withd ID - ${customerId} not found.`,
       data: deletedCustomer
     })

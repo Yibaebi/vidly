@@ -1,14 +1,14 @@
 const jwt = require('jsonwebtoken')
 const config = require('config')
 
-const { ERROR_CODES } = require('../../constants')
+const { RESPONSE_CODES } = require('../../constants')
 
 const authenticator = (req, res, next) => {
   const token = req.headers['x-auth-token']
 
   if (!token) {
-    return res.status(ERROR_CODES.UNAUTHORIZED).send({
-      status: ERROR_CODES.UNAUTHORIZED,
+    return res.status(RESPONSE_CODES.UNAUTHORIZED).send({
+      status: RESPONSE_CODES.UNAUTHORIZED,
       message: 'Access Denied. No token provided.'
     })
   }
@@ -21,8 +21,8 @@ const authenticator = (req, res, next) => {
 
     next()
   } catch (error) {
-    res.status(ERROR_CODES.UNAUTHORIZED).send({
-      status: ERROR_CODES.UNAUTHORIZED,
+    res.status(RESPONSE_CODES.UNAUTHORIZED).send({
+      status: RESPONSE_CODES.UNAUTHORIZED,
       message: 'Invalid auth token. Access Denied.'
     })
   }

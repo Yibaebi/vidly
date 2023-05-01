@@ -2,7 +2,7 @@ const express = require('express')
 
 const { Movie, validateMovie, Genre } = require('../../models')
 const { authenticator } = require('../../middlewares')
-const { ERROR_CODES } = require('../../constants')
+const { RESPONSE_CODES } = require('../../constants')
 
 // Setup router
 const router = express.Router()
@@ -11,8 +11,8 @@ const router = express.Router()
 router.get('/', async (req, res) => {
   const movies = await Movie.find()
   res
-    .status(ERROR_CODES.OK)
-    .send({ status: ERROR_CODES.OK, data: movies, count: movies.length })
+    .status(RESPONSE_CODES.OK)
+    .send({ status: RESPONSE_CODES.OK, data: movies, count: movies.length })
 })
 
 // Get a movie
@@ -22,14 +22,14 @@ router.get('/:id', async (req, res) => {
   const genre = await Movie.findById(id)
 
   if (!genre) {
-    return res.status(ERROR_CODES.NOT_FOUND).send({
-      status: ERROR_CODES.NOT_FOUND,
+    return res.status(RESPONSE_CODES.NOT_FOUND).send({
+      status: RESPONSE_CODES.NOT_FOUND,
       data: null,
       message: `Movie with ID - ${id} not found.`
     })
   }
 
-  res.status(ERROR_CODES.OK).send({ status: ERROR_CODES.OK, data: genre })
+  res.send({ status: RESPONSE_CODES.OK, data: genre })
 })
 
 // Add a movie
@@ -37,8 +37,8 @@ router.post('/', authenticator, async (req, res) => {
   const { error } = validateMovie(req.body)
 
   if (error) {
-    return res.status(ERROR_CODES.BAD_REQUEST).send({
-      status: ERROR_CODES.BAD_REQUEST,
+    return res.status(RESPONSE_CODES.BAD_REQUEST).send({
+      status: RESPONSE_CODES.BAD_REQUEST,
       message: error.details[0].message.replaceAll('"', ''),
       data: null
     })
@@ -53,8 +53,8 @@ router.post('/', authenticator, async (req, res) => {
   })
 
   if (movieWithSameTitleAndGenre) {
-    return res.status(ERROR_CODES.CONFLICT).send({
-      status: ERROR_CODES.CONFLICT,
+    return res.status(RESPONSE_CODES.CONFLICT).send({
+      status: RESPONSE_CODES.CONFLICT,
       message: `Movie with title "${movieWithSameTitleAndGenre.title}" and genre with ID - "${movieWithSameTitleAndGenre.genre.id}" already exists.`,
       data: null
     })
@@ -63,8 +63,8 @@ router.post('/', authenticator, async (req, res) => {
   const genre = await fetchMovieGenre(genreId)
 
   if (genreId && !genre) {
-    return res.status(ERROR_CODES.NOT_FOUND).send({
-      status: ERROR_CODES.NOT_FOUND,
+    return res.status(RESPONSE_CODES.NOT_FOUND).send({
+      status: RESPONSE_CODES.NOT_FOUND,
       message: `Genre with ID - ${genreId} not found.`
     })
   }
@@ -73,8 +73,8 @@ router.post('/', authenticator, async (req, res) => {
 
   await newMovie.save()
 
-  res.status(ERROR_CODES.OK).send({
-    status: ERROR_CODES.OK,
+  res.send({
+    status: RESPONSE_CODES.OK,
     message: 'Movie created successfully.',
     data: newMovie
   })
@@ -85,8 +85,8 @@ router.put('/:id', authenticator, async (req, res) => {
   const { error } = validateMovie(req.body, false)
 
   if (error) {
-    return res.status(ERROR_CODES.BAD_REQUEST).send({
-      status: ERROR_CODES.BAD_REQUEST,
+    return res.status(RESPONSE_CODES.BAD_REQUEST).send({
+      status: RESPONSE_CODES.BAD_REQUEST,
       message: error.details[0].message.replaceAll('"', ''),
       data: null
     })
@@ -96,8 +96,8 @@ router.put('/:id', authenticator, async (req, res) => {
   const genre = await fetchMovieGenre(genreId)
 
   if (genreId && !genre) {
-    return res.status(ERROR_CODES.NOT_FOUND).send({
-      status: ERROR_CODES.NOT_FOUND,
+    return res.status(RESPONSE_CODES.NOT_FOUND).send({
+      status: RESPONSE_CODES.NOT_FOUND,
       message: `Genre with ID - ${genreId} not found.`
     })
   }
@@ -112,15 +112,15 @@ router.put('/:id', authenticator, async (req, res) => {
   )
 
   if (!movie) {
-    return res.status(ERROR_CODES.NOT_FOUND).send({
-      status: ERROR_CODES.NOT_FOUND,
+    return res.status(RESPONSE_CODES.NOT_FOUND).send({
+      status: RESPONSE_CODES.NOT_FOUND,
       message: `Movie with ID - ${movieId} does not exists.`,
       data: null
     })
   }
 
-  res.status(ERROR_CODES.OK).send({
-    status: ERROR_CODES.OK,
+  res.send({
+    status: RESPONSE_CODES.OK,
     message: 'Movie updated successfully!',
     data: movie
   })
@@ -133,14 +133,14 @@ router.delete('/:id', authenticator, async (req, res) => {
   const deletedMovie = await Movie.findByIdAndDelete(movieId)
 
   if (deletedMovie) {
-    res.status(ERROR_CODES.OK).send({
-      status: ERROR_CODES.OK,
+    res.send({
+      status: RESPONSE_CODES.OK,
       message: 'Movie deleted successfully',
       data: deletedMovie
     })
   } else {
-    res.status(ERROR_CODES.NOT_FOUND).send({
-      status: ERROR_CODES.NOT_FOUND,
+    res.status(RESPONSE_CODES.NOT_FOUND).send({
+      status: RESPONSE_CODES.NOT_FOUND,
       message: `Movie with id ${movieId} does not exist.`,
       data: null
     })

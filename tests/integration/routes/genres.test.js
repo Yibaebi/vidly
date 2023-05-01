@@ -1,7 +1,7 @@
 const request = require('supertest')
 const server = require('../../..')
 const { Genre, User } = require('../../../models')
-const { ERROR_CODES } = require('../../../constants')
+const { RESPONSE_CODES } = require('../../../constants')
 
 describe('Integration | routes/genres', () => {
   const BASE_URL = '/api/genres'
@@ -21,7 +21,7 @@ describe('Integration | routes/genres', () => {
 
       const response = await AGENT.get(BASE_URL)
 
-      expect(response.status).toBe(ERROR_CODES.OK)
+      expect(response.status).toBe(RESPONSE_CODES.OK)
       expect(response.body.count).toBe(2)
       expect(response.body.data.some((g) => g.title === 'genre1')).toBeTruthy()
       expect(response.body.data.some((g) => g.title === 'genre2')).toBeTruthy()
@@ -35,21 +35,21 @@ describe('Integration | routes/genres', () => {
 
       const response = await AGENT.get(`${BASE_URL}/${genre._id}`)
 
-      expect(response.status).toBe(ERROR_CODES.OK)
+      expect(response.status).toBe(RESPONSE_CODES.OK)
       expect(response.body.data).toHaveProperty('_id', genre.id)
       expect(response.body.data).toHaveProperty('title', genre.title)
     })
 
     it('should return 404 if genre is invalid', async () => {
       const response = await AGENT.get(`${BASE_URL}/1`)
-      expect(response.status).toBe(ERROR_CODES.NOT_FOUND)
+      expect(response.status).toBe(RESPONSE_CODES.NOT_FOUND)
     })
 
     it('should return 404 if genre is not found', async () => {
       const genre = new Genre({ title: 'genre_test' })
       const response = await AGENT.get(`${BASE_URL}/${genre._id}`)
 
-      expect(response.status).toBe(ERROR_CODES.NOT_FOUND)
+      expect(response.status).toBe(RESPONSE_CODES.NOT_FOUND)
     })
   })
 
@@ -68,13 +68,13 @@ describe('Integration | routes/genres', () => {
     it('returns a 401 status if user is unauthorized', async () => {
       const response = await exec({ token: '' })
 
-      expect(response.status).toBe(ERROR_CODES.UNAUTHORIZED)
+      expect(response.status).toBe(RESPONSE_CODES.UNAUTHORIZED)
     })
 
     it('returns a 400 if genre is less than 3 characters ', async () => {
       const response = await exec({ genre: { title: 'ge' } })
 
-      expect(response.status).toBe(ERROR_CODES.BAD_REQUEST)
+      expect(response.status).toBe(RESPONSE_CODES.BAD_REQUEST)
     })
 
     it('returns a 400 if genre is greater than 50 characters ', async () => {
@@ -83,7 +83,7 @@ describe('Integration | routes/genres', () => {
 
       const response = await exec({ genre })
 
-      expect(response.status).toBe(ERROR_CODES.BAD_REQUEST)
+      expect(response.status).toBe(RESPONSE_CODES.BAD_REQUEST)
     })
 
     it('returns a 409 if genre already exists ', async () => {
@@ -94,13 +94,13 @@ describe('Integration | routes/genres', () => {
 
       const response = await exec({ genre: { title } })
 
-      expect(response.status).toBe(ERROR_CODES.CONFLICT)
+      expect(response.status).toBe(RESPONSE_CODES.CONFLICT)
     })
 
     it('creates a genre successfully if request body is valid', async () => {
       const response = await exec()
 
-      expect(response.body.status).toBe(ERROR_CODES.OK)
+      expect(response.body.status).toBe(RESPONSE_CODES.OK)
       expect(response.body.data).toMatchObject(mockGenre)
     })
   })
@@ -127,7 +127,7 @@ describe('Integration | routes/genres', () => {
       const genre = await createGenre()
       const response = await updateGenreExec(genre)
 
-      expect(response.body.status).toBe(ERROR_CODES.OK)
+      expect(response.body.status).toBe(RESPONSE_CODES.OK)
       expect(response.body.data).toHaveProperty('title', 'updated_title')
     })
 
@@ -135,21 +135,21 @@ describe('Integration | routes/genres', () => {
       const genre = await createGenre()
       const response = await updateGenreExec(genre, 'up')
 
-      expect(response.body.status).toBe(ERROR_CODES.BAD_REQUEST)
+      expect(response.body.status).toBe(RESPONSE_CODES.BAD_REQUEST)
     })
 
     it('returns 409 if update title is greater than 50 characters', async () => {
       const genre = await createGenre()
       const response = await updateGenreExec(genre, new Array(52).join('a'))
 
-      expect(response.body.status).toBe(ERROR_CODES.BAD_REQUEST)
+      expect(response.body.status).toBe(RESPONSE_CODES.BAD_REQUEST)
     })
 
     it('returns 409 if update title is the same', async () => {
       const genre = await createGenre()
       const response = await updateGenreExec(genre, genre.title)
 
-      expect(response.body.status).toBe(ERROR_CODES.CONFLICT)
+      expect(response.body.status).toBe(RESPONSE_CODES.CONFLICT)
     })
 
     it('returns 409 if update title if a genre with same title already exists in DB', async () => {
@@ -158,14 +158,14 @@ describe('Integration | routes/genres', () => {
       const genre = await createGenre('genre_test_2')
       const response = await updateGenreExec(genre, 'genre_test_1')
 
-      expect(response.body.status).toBe(ERROR_CODES.CONFLICT)
+      expect(response.body.status).toBe(RESPONSE_CODES.CONFLICT)
     })
 
     it('returns 404 if genre does not exist', async () => {
       const genre = new Genre({ title: 'genre_test' })
       const response = await updateGenreExec(genre)
 
-      expect(response.body.status).toBe(ERROR_CODES.NOT_FOUND)
+      expect(response.body.status).toBe(RESPONSE_CODES.NOT_FOUND)
     })
   })
 
@@ -191,7 +191,7 @@ describe('Integration | routes/genres', () => {
       const genre = await createGenre()
       const response = await deleteGenreExec(genre)
 
-      expect(response.body.status).toBe(ERROR_CODES.OK)
+      expect(response.body.status).toBe(RESPONSE_CODES.OK)
 
       const deletedGenre = await Genre.findById(genre.id)
       expect(deletedGenre).toBeNull()
@@ -201,7 +201,7 @@ describe('Integration | routes/genres', () => {
       const genre = new Genre({ title: 'genre_test' })
       const response = await deleteGenreExec(genre)
 
-      expect(response.body.status).toBe(ERROR_CODES.NOT_FOUND)
+      expect(response.body.status).toBe(RESPONSE_CODES.NOT_FOUND)
     })
   })
 })
